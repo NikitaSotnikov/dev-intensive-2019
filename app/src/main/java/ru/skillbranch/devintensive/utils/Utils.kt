@@ -5,15 +5,16 @@ object Utils {
         var parts: List<String>? = null
         val firstName: String?
         val lastName: String?
-        if (!fullName?.trim().isNullOrEmpty()) {
-            parts = fullName?.split(" ")
+        val tempName = fullName?.trim()?.replace("\\s+".toRegex()," ")
+        if (!tempName.isNullOrEmpty()) {
+            parts = tempName?.split(" ")
         }
         firstName = parts?.getOrNull(0)
         lastName = parts?.getOrNull(1)
         return firstName to lastName
     }
 
-    fun transliterations(payload: String, divider: String = " "): String {
+    fun transliteration(payload: String, divider: String = " "): String {
         var finalResult = ""
         var flag = true
         val mapOfChar: MutableMap<Char, String> = mutableMapOf()
@@ -43,7 +44,7 @@ object Utils {
         mapOfChar['ц'] = "c"
         mapOfChar['ч'] = "ch"
         mapOfChar['ш'] = "sh"
-        mapOfChar['щ'] = "sh"
+        mapOfChar['щ'] = "sh'"
         mapOfChar['ъ'] = ""
         mapOfChar['ы'] = "i"
         mapOfChar['ь'] = ""
@@ -51,21 +52,47 @@ object Utils {
         mapOfChar['ю'] = "yu"
         mapOfChar['я'] = "ya"
 
-        for (char in payload.toLowerCase()) {
-            if (char in mapOfChar) {
-                if (flag) {
-                    finalResult += mapOfChar[char]!!.toUpperCase()
-                    flag = false
+//        for (char in payload.toLowerCase()) {
+//            if (char in mapOfChar) {
+//                if (flag) {
+//                    val temp = mapOfChar[char]
+//                    if (temp!!.length > 1) {
+//                        finalResult += temp.substring(0, 1).toUpperCase() + temp.substring(1)
+//                    } else {
+//                        finalResult += mapOfChar[char]!!.toUpperCase()
+//                    }
+//                    flag = false
+//                } else {
+//                    finalResult += mapOfChar[char]
+//                }
+//            } else if (char == ' ') {
+//                finalResult += divider
+//                flag = true
+//            } else {
+//                if (flag) {
+//                    finalResult += char.toUpperCase()
+//                    flag=false
+//                } else finalResult += char
+//            }
+//        }
+
+        for (char in payload) {
+            if (char.toLowerCase() in mapOfChar) {
+                if (char.isUpperCase()) {
+                    val temp = mapOfChar[char.toLowerCase()]
+                    if (temp!!.length > 1) {
+                        finalResult += temp.substring(0, 1).toUpperCase() + temp.substring(1)
+                    } else {
+                        finalResult += temp.toUpperCase()
+                    }
                 } else {
                     finalResult += mapOfChar[char]
                 }
             } else if (char == ' ') {
                 finalResult += divider
-                flag = true
             } else {
-                if (flag) {
+                if (char.isUpperCase()) {
                     finalResult += char.toUpperCase()
-                    flag=false
                 } else finalResult += char
             }
         }
