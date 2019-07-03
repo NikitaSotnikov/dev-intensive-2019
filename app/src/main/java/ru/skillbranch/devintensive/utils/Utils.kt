@@ -100,12 +100,15 @@ object Utils {
     }
 
     fun toInitials(firstName: String?, lastName: String?): String? {
-        var initials: String? = null
+        var initials: String? = ""
         if (!firstName?.trim().isNullOrEmpty()) {
-            initials = firstName?.getOrNull(0)?.toUpperCase().toString()
+            initials += firstName?.getOrNull(0)?.toUpperCase().toString()
         }
         if (!lastName?.trim().isNullOrEmpty()) {
             initials += lastName?.getOrNull(0)?.toUpperCase().toString()
+        }
+        if (initials.isNullOrEmpty()) {
+            initials = null
         }
         return initials
     }
