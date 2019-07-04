@@ -52,30 +52,6 @@ object Utils {
         mapOfChar['ю'] = "yu"
         mapOfChar['я'] = "ya"
 
-//        for (char in payload.toLowerCase()) {
-//            if (char in mapOfChar) {
-//                if (flag) {
-//                    val temp = mapOfChar[char]
-//                    if (temp!!.length > 1) {
-//                        finalResult += temp.substring(0, 1).toUpperCase() + temp.substring(1)
-//                    } else {
-//                        finalResult += mapOfChar[char]!!.toUpperCase()
-//                    }
-//                    flag = false
-//                } else {
-//                    finalResult += mapOfChar[char]
-//                }
-//            } else if (char == ' ') {
-//                finalResult += divider
-//                flag = true
-//            } else {
-//                if (flag) {
-//                    finalResult += char.toUpperCase()
-//                    flag=false
-//                } else finalResult += char
-//            }
-//        }
-
         for (char in payload) {
             if (char.toLowerCase() in mapOfChar) {
                 if (char.isUpperCase()) {

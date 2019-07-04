@@ -24,12 +24,12 @@ fun Date.add(value: Int, units: TimeUnits = TimeUnits.SECOND): Date {
         TimeUnits.HOUR -> value * HOUR
         TimeUnits.DAY -> value * DAY
     }
-    this.time=time
+    this.time = time
     return this
 }
 
 fun Date.humanizeDiff(date: Date = Date()): String {
-    val tempDiff: Long = (date.time/1000 - this.time/1000)*1000
+    val tempDiff: Long = (date.time / 1000 - this.time / 1000) * 1000
     val diff = abs(tempDiff)
     var result = ""
     result += when {
@@ -78,13 +78,58 @@ fun Date.humanizeDiff(date: Date = Date()): String {
             result = "через $result"
         }
     }
-    if (result == "через более года") result="более чем через год"
+    if (result == "через более года") result = "более чем через год"
     return result
 }
 
-enum class TimeUnits{
+enum class TimeUnits {
     SECOND,
     MINUTE,
     HOUR,
-    DAY
+    DAY;
+
+    fun plural(value: Int): String {
+        return when (this) {
+            SECOND -> {
+                "$value " + if (value in 10..19) "секунд" else {
+                    when (value % 10) {
+                        1 -> "секунду"
+                        2, 3, 4 -> "секунды"
+                        0, 5, 6, 7, 8, 9 -> "секунд"
+                        else -> throw IllegalStateException("invalid time")
+                    }
+                }
+            }
+            MINUTE -> {
+                "$value " + if (value in 10..19) "минут" else {
+                    when (value % 10) {
+                        1 -> "минуту"
+                        2, 3, 4 -> "минуты"
+                        0, 5, 6, 7, 8, 9 -> "минут"
+                        else -> throw IllegalStateException("invalid time")
+                    }
+                }
+            }
+            HOUR -> {
+                "$value " + if (value in 10..19) "часов" else {
+                    when (value % 10) {
+                        1 -> "час"
+                        2, 3, 4 -> "часа"
+                        0, 5, 6, 7, 8, 9 -> "часов"
+                        else -> throw IllegalStateException("invalid time")
+                    }
+                }
+            }
+            DAY -> {
+                "$value " + if (value in 10..19) "дней" else {
+                    when (value % 10) {
+                        1 -> "день"
+                        2, 3, 4 -> "дня"
+                        0, 5, 6, 7, 8, 9 -> "дней"
+                        else -> throw IllegalStateException("invalid time")
+                    }
+                }
+            }
+        }
+    }
 }
