@@ -30,12 +30,12 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
     fun checkCorrectAnswer(answer: String): String {
         return if (answer.isNotEmpty()) {
             when (question) {
-                Question.NAME -> if (!answer[0].isUpperCase()) "Имя должно начинаться с заглавной буквы" else "-1"
-                Question.PROFESSION -> if (!answer[0].isLowerCase()) "Профессия должна начинаться со строчной буквы" else "-1"
-                Question.MATERIAL -> if (!answer.contains("\\D".toRegex())) "Материал не должен содержать цифр" else "-1"
-                Question.BDAY -> if (!answer.contains("\\d".toRegex())) "Год моего рождения должен содержать только цифры" else "-1"
-                Question.SERIAL -> if (!(answer.contains("\\d".toRegex()) && answer.length == 7)) "Серийный номер содержит только цифры, и их 7" else "-1"
-                Question.IDLE -> ""
+                Question.NAME -> if (!answer[0].isUpperCase()) "Имя должно начинаться с заглавной буквы\n${question.question}" else "-1"
+                Question.PROFESSION -> if (!answer[0].isLowerCase()) "Профессия должна начинаться со строчной буквы\n${question.question}" else "-1"
+                Question.MATERIAL -> if (!answer.contains("\\D".toRegex())) "Материал не должен содержать цифр\n${question.question}" else "-1"
+                Question.BDAY -> if (!answer.contains("\\d".toRegex())) "Год моего рождения должен содержать только цифры\n${question.question}" else "-1"
+                Question.SERIAL -> if (!(answer.contains("\\d".toRegex()) && answer.length == 7)) "Серийный номер содержит только цифры, и их 7\n${question.question}" else "-1"
+                Question.IDLE -> "-1"
             }.toString()
         } else "-1"
     }
