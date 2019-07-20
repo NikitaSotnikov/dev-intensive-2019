@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     textTxt.text = phrase
                 } else {
                     textTxt.text = checkAnswer
+                    messageEt.setText("")
                 }
                 if (isKeyboardOpen()) {
                     Log.d("M_MainActivity", "keyboardOpen")
@@ -107,6 +108,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 textTxt.text = phrase
             } else {
                 textTxt.text = checkAnswer
+                messageEt.setText("")
             }
             if (isKeyboardOpen()) {
                 Log.d("M_MainActivity", "keyboardOpen")
