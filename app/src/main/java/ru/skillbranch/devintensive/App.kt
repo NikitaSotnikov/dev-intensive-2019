@@ -5,17 +5,17 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import ru.skillbranch.devintensive.repositories.PreferenceRepository
 
-class App : Application() {
+class App: Application() {
 
-    companion object{
+    companion object {
         private var instance: App? = null
 
-        fun applicationContext(): Context {
+        fun applicationContext() : Context {
             return instance!!.applicationContext
         }
     }
 
-    init{
+    init {
         instance = this
     }
 
@@ -24,6 +24,5 @@ class App : Application() {
         PreferenceRepository.getAppTheme().also {
             AppCompatDelegate.setDefaultNightMode(it)
         }
-        //TODO call once when application created
     }
 }

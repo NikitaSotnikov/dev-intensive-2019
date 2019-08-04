@@ -1,135 +1,62 @@
 package ru.skillbranch.devintensive.extensions
 
-import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.abs
-
-const val SECOND = 1000L
-const val MINUTE = 60 * SECOND
-const val HOUR = 60 * MINUTE
-const val DAY = 24 * HOUR
+import ru.skillbranch.devintensive.extensions.TimeUnits.*
 
 fun Date.format(pattern: String = "HH:mm:ss dd.MM.yy"): String {
     val dateFormat = SimpleDateFormat(pattern, Locale("ru"))
     return dateFormat.format(this)
 }
 
-fun Date.add(value: Int, units: TimeUnits = TimeUnits.SECOND): Date {
-    var time = this.time
-
-    time += when (units) {
-        TimeUnits.SECOND -> value * SECOND
-        TimeUnits.MINUTE -> value * MINUTE
-        TimeUnits.HOUR -> value * HOUR
-        TimeUnits.DAY -> value * DAY
-    }
-    this.time = time
+fun Date.add(value: Int, units: TimeUnits = SECOND): Date {
+    this.time = this.time + (units.value * value)
     return this
 }
 
 fun Date.humanizeDiff(date: Date = Date()): String {
-    val tempDiff: Long = (date.time / 1000 - this.time / 1000) * 1000
-    val diff = abs(tempDiff)
-    var result = ""
-    result += when {
-        diff <= 1 * SECOND -> "только что"
-        diff <= 45 * SECOND -> "несколько секунд"
-        diff <= 75 * SECOND -> "минуту"
-        diff <= 45 * MINUTE -> {
-            "${diff / MINUTE} " + if ((diff / MINUTE) in 10..19) "минут" else {
-                when ((diff / MINUTE).toInt() % 10) {
-                    1 -> "минуту"
-                    2, 3, 4 -> "минуты"
-                    0, 5, 6, 7, 8, 9 -> "минут"
-                    else -> throw IllegalStateException("invalid time")
-                }
-            }
-        }
-        diff <= 75 * MINUTE -> "час"
-        diff <= 22 * HOUR -> {
-            "${diff / HOUR} " + if ((diff / HOUR) in 10..19) "часов" else {
-                when ((diff / HOUR).toInt() % 10) {
-                    1 -> "час"
-                    2, 3, 4 -> "часа"
-                    0, 5, 6, 7, 8, 9 -> "часов"
-                    else -> throw IllegalStateException("invalid time")
-                }
-            }
-        }
-        diff <= 26 * HOUR -> "день"
-        diff <= 360 * DAY -> {
-            "${diff / DAY} " + if ((diff / DAY) in 10..19) "дней" else {
-                when ((diff / DAY).toInt() % 10) {
-                    1 -> "день"
-                    2, 3, 4 -> "дня"
-                    0, 5, 6, 7, 8, 9 -> "дней"
-                    else -> throw IllegalStateException("invalid time")
-                }
-            }
-        }
-        diff > 360 * DAY -> "более года"
-        else -> throw IllegalStateException("invalid time")
+    var prefix = ""
+    var postfix = ""
+
+    var difference = date.time - this.time
+
+    if (difference < 0){
+        prefix = "через "
+        difference = -difference
+    } else {
+        postfix = " назад"
     }
-    if (!result.contains("только что")) {
-        if (tempDiff >= 0) {
-            result += " назад"
-        } else {
-            result = "через $result"
-        }
+
+    return when(difference) {
+        in 0..1*SECOND.value -> "только что"
+        in 1*SECOND.value..45*SECOND.value -> "${prefix}несколько секунд$postfix"
+        in 45*SECOND.value..75*SECOND.value -> "${prefix}минуту$postfix"
+        in 75*SECOND.value..45*MINUTE.value -> "$prefix${MINUTE.plural(difference/MINUTE.value)}$postfix"
+        in 45*MINUTE.value..75*MINUTE.value -> "${prefix}час$postfix"
+        in 75*MINUTE.value..22*HOUR.value -> "$prefix${HOUR.plural(difference/HOUR.value)}$postfix"
+        in 22*HOUR.value..26*HOUR.value -> "${prefix}день$postfix"
+        in 26*HOUR.value..360*DAY.value -> "$prefix${DAY.plural(difference/DAY.value)}$postfix"
+        else -> if(date.time - this.time < 0) "более чем через год" else "более года назад"
     }
-    if (result == "через более года") result = "более чем через год"
-    return result
 }
 
-enum class TimeUnits {
-    SECOND,
-    MINUTE,
-    HOUR,
-    DAY;
+enum class TimeUnits(val value: Long, private val ONE: String, private val FEW: String, private val MANY: String) {
 
-    fun plural(value: Int): String {
-        return when (this) {
-            SECOND -> {
-                "$value " + if (value in 10..19) "секунд" else {
-                    when (value % 10) {
-                        1 -> "секунду"
-                        2, 3, 4 -> "секунды"
-                        0, 5, 6, 7, 8, 9 -> "секунд"
-                        else -> throw IllegalStateException("invalid time")
-                    }
-                }
-            }
-            MINUTE -> {
-                "$value " + if (value in 10..19) "минут" else {
-                    when (value % 10) {
-                        1 -> "минуту"
-                        2, 3, 4 -> "минуты"
-                        0, 5, 6, 7, 8, 9 -> "минут"
-                        else -> throw IllegalStateException("invalid time")
-                    }
-                }
-            }
-            HOUR -> {
-                "$value " + if (value in 10..19) "часов" else {
-                    when (value % 10) {
-                        1 -> "час"
-                        2, 3, 4 -> "часа"
-                        0, 5, 6, 7, 8, 9 -> "часов"
-                        else -> throw IllegalStateException("invalid time")
-                    }
-                }
-            }
-            DAY -> {
-                "$value " + if (value in 10..19) "дней" else {
-                    when (value % 10) {
-                        1 -> "день"
-                        2, 3, 4 -> "дня"
-                        0, 5, 6, 7, 8, 9 -> "дней"
-                        else -> throw IllegalStateException("invalid time")
-                    }
-                }
-            }
+    SECOND(1000L,"секунду", "секунды", "секунд"),
+    MINUTE(1000L*60L, "минуту", "минуты", "минут"),
+    HOUR(1000L*60L*60L, "час", "часа", "часов"),
+    DAY(1000L*60L*60L*24L, "день", "дня", "дней");
+
+    fun plural(num: Long) : String {
+        return "$num ${this.getAmount(num)}"
+    }
+
+    private fun getAmount(num: Long) : String {
+        return when{
+            num in 5..20L -> MANY
+            num%10  == 1L  -> ONE
+            num%10 in 2..4L  -> FEW
+            else -> MANY
         }
     }
 }

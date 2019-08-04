@@ -1,91 +1,80 @@
 package ru.skillbranch.devintensive.utils
 
+import android.content.Context
+import android.util.TypedValue
+import ru.skillbranch.devintensive.R
+
 object Utils {
+
     fun parseFullName(fullName: String?): Pair<String?, String?> {
-        var parts: List<String>? = null
-        val firstName: String?
-        val lastName: String?
-        val tempName = fullName?.trim()?.replace("\\s+".toRegex()," ")
-        if (!tempName.isNullOrEmpty()) {
-            parts = tempName?.split(" ")
-        }
-        firstName = parts?.getOrNull(0)
-        lastName = parts?.getOrNull(1)
+        val parts: List<String>? = fullName?.split(" ")
+
+        val firstName = parts?.getOrNull(0)?.ifEmpty{ null }
+        val lastName = parts?.getOrNull(1)?.ifEmpty{ null }
+
         return firstName to lastName
     }
 
     fun transliteration(payload: String, divider: String = " "): String {
-        var finalResult = ""
-        var flag = true
-        val mapOfChar: MutableMap<Char, String> = mutableMapOf()
-        mapOfChar['а'] = "a"
-        mapOfChar['б'] = "b"
-        mapOfChar['в'] = "v"
-        mapOfChar['г'] = "g"
-        mapOfChar['д'] = "d"
-        mapOfChar['е'] = "e"
-        mapOfChar['ё'] = "e"
-        mapOfChar['ж'] = "zh"
-        mapOfChar['з'] = "z"
-        mapOfChar['и'] = "i"
-        mapOfChar['й'] = "i"
-        mapOfChar['к'] = "k"
-        mapOfChar['л'] = "l"
-        mapOfChar['м'] = "m"
-        mapOfChar['н'] = "n"
-        mapOfChar['о'] = "o"
-        mapOfChar['п'] = "p"
-        mapOfChar['р'] = "r"
-        mapOfChar['с'] = "s"
-        mapOfChar['т'] = "t"
-        mapOfChar['у'] = "u"
-        mapOfChar['ф'] = "f"
-        mapOfChar['х'] = "h"
-        mapOfChar['ц'] = "c"
-        mapOfChar['ч'] = "ch"
-        mapOfChar['ш'] = "sh"
-        mapOfChar['щ'] = "sh'"
-        mapOfChar['ъ'] = ""
-        mapOfChar['ы'] = "i"
-        mapOfChar['ь'] = ""
-        mapOfChar['э'] = "e"
-        mapOfChar['ю'] = "yu"
-        mapOfChar['я'] = "ya"
+        var nickname = ""
 
-        for (char in payload) {
-            if (char.toLowerCase() in mapOfChar) {
-                if (char.isUpperCase()) {
-                    val temp = mapOfChar[char.toLowerCase()]
-                    if (temp!!.length > 1) {
-                        finalResult += temp.substring(0, 1).toUpperCase() + temp.substring(1)
-                    } else {
-                        finalResult += temp.toUpperCase()
-                    }
-                } else {
-                    finalResult += mapOfChar[char]
-                }
-            } else if (char == ' ') {
-                finalResult += divider
-            } else {
-                if (char.isUpperCase()) {
-                    finalResult += char.toUpperCase()
-                } else finalResult += char
+        payload.trim().forEach {
+            nickname += when {
+                it == ' ' -> divider
+                dictionary.containsKey(it.toLowerCase()) ->
+                    if(it.isUpperCase()) dictionary[it.toLowerCase()]?.capitalize() else dictionary[it]
+                else -> it
             }
         }
-        return finalResult
+        return nickname
     }
 
     fun toInitials(firstName: String?, lastName: String?): String? {
-        var initials: String? = ""
-        if (!firstName?.trim().isNullOrEmpty()) {
-            initials += firstName?.getOrNull(0)?.toUpperCase().toString()
-        }
-        if (!lastName?.trim().isNullOrEmpty()) {
-            initials += lastName?.getOrNull(0)?.toUpperCase().toString()
-        }
-        if (initials.isNullOrEmpty()) {
-            initials = null
-        }
-        return initials
+        val firstLetter = firstName?.trim()?.firstOrNull()?.toUpperCase() ?: ""
+        val secondLetter = lastName?.trim()?.firstOrNull()?.toUpperCase() ?: ""
+
+        return "$firstLetter$secondLetter".ifEmpty { null }
+    }
+
+    private val dictionary = mapOf(
+        'а' to "a",
+        'б' to "b",
+        'в' to "v",
+        'г' to "g",
+        'д' to "d",
+        'е' to "e",
+        'ё' to "e",
+        'ж' to "zh",
+        'з' to "z",
+        'и' to "i",
+        'й' to "i",
+        'к' to "k",
+        'л' to "l",
+        'м' to "m",
+        'н' to "n",
+        'о' to "o",
+        'п' to "p",
+        'р' to "r",
+        'с' to "s",
+        'т' to "t",
+        'у' to "u",
+        'ф' to "f",
+        'х' to "h",
+        'ц' to "c",
+        'ч' to "ch",
+        'ш' to "sh",
+        'щ' to "sh'",
+        'ъ' to "",
+        'ы' to "i",
+        'ь' to "",
+        'э' to "e",
+        'ю' to "yu",
+        'я' to "ya"
+    )
+
+    fun getThemeAccentColor(context: Context): Int {
+        val value = TypedValue()
+        context.theme.resolveAttribute(R.attr.colorAccent, value, true)
+        return value.data
     }
 }
