@@ -163,6 +163,6 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun setDefaultAvatar(initials: String) {
-        iv_avatar.setImageBitmap(iv_avatar.drawDefaultAvatar(initials))
+//        iv_avatar.setImageBitmap(iv_avatar.drawDefaultAvatar(initials))
     }
 }
